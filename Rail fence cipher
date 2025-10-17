@@ -1,0 +1,94 @@
+public class RailFenceCipher {
+
+    // Encrypt text using Rail Fence Cipher
+    public static String encrypt(String text, int rails) {
+        if (rails <= 1) return text;
+
+        StringBuilder[] rail = new StringBuilder[rails];
+        for (int i = 0; i < rails; i++)
+            rail[i] = new StringBuilder();
+
+        int row = 0;
+        boolean down = true;
+
+        for (char c : text.toCharArray()) {
+            rail[row].append(c);
+
+            if (row == 0)
+                down = true;
+            else if (row == rails - 1)
+                down = false;
+
+            row += down ? 1 : -1;
+        }
+
+        StringBuilder cipher = new StringBuilder();
+        for (StringBuilder sb : rail)
+            cipher.append(sb);
+
+        return cipher.toString();
+    }
+
+    // Decrypt text using Rail Fence Cipher
+    public static String decrypt(String cipher, int rails) {
+        if (rails <= 1) return cipher;
+
+        boolean[][] mark = new boolean[rails][cipher.length()];
+        int row = 0;
+        boolean down = true;
+
+        // Step 1: Mark zigzag pattern
+        for (int i = 0; i < cipher.length(); i++) {
+            mark[row][i] = true;
+
+            if (row == 0)
+                down = true;
+            else if (row == rails - 1)
+                down = false;
+
+            row += down ? 1 : -1;
+        }
+
+        // Step 2: Fill the pattern with ciphertext characters
+        int index = 0;
+        char[][] rail = new char[rails][cipher.length()];
+        for (int i = 0; i < rails; i++) {
+            for (int j = 0; j < cipher.length(); j++) {
+                if (mark[i][j] && index < cipher.length()) {
+                    rail[i][j] = cipher.charAt(index++);
+                }
+            }
+        }
+
+        // Step 3: Read in zigzag manner to decrypt
+        StringBuilder result = new StringBuilder();
+        row = 0;
+        down = true;
+        for (int i = 0; i < cipher.length(); i++) {
+            result.append(rail[row][i]);
+
+            if (row == 0)
+                down = true;
+            else if (row == rails - 1)
+                down = false;
+
+            row += down ? 1 : -1;
+        }
+
+        return result.toString();
+    }
+
+    // Demo
+    public static void main(String[] args) {
+        String plaintext = "WEAREDISCOVEREDFLEEATONCE";
+        int rails = 3;
+
+        String encrypted = encrypt(plaintext, rails);
+        String decrypted = decrypt(encrypted, rails);
+
+        System.out.println("Plaintext : " + plaintext);
+        System.out.println("Rails     : " + rails);
+        System.out.println("Encrypted : " + encrypted);
+        System.out.println("Decrypted : " + decrypted);
+    }
+}
